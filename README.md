@@ -14,8 +14,8 @@ Built for **AWS Lambda**, it interacts with Spotify's API and stores playlist me
 - `boto3` for AWS S3 integration
 - AWS Lambda with environment variables for Spotify credentials
 - S3 bucket containing:
-  - `playlist_update_users.json`: list of user IDs
-  - `playlists_info.json`: initially empty, will store playlist URIs
+  - `playlist_update_users.json`(default): list of user IDs
+  - `playlists_info.json`(default): initially empty, will store playlist URIs
   - `.cache-USER_ID`: Spotify cache file for each user
 
 ## Environment Variables
@@ -29,11 +29,15 @@ Each user must have the following variables set in Lambda or your environment:
 
 ## Usage
 ```bash
-# Run locally with Python
-python lambda_handler.py
-
-# Or deploy to AWS Lambda
-# Make sure the environment variables and S3 files are correctly set
+# Deploy to AWS Lambda
+# 1. Upload the code to a Lambda function.
+# 2. Set the required environment variables (client ID, client secret, redirect URL) for each user.
+# 3. Set BUCKET_NAME in settings.py. If you make your own key, change the FILE_KEY name.
+# 4. Ensure the following S3 files exist:
+#    - users json file (default -> playlist_update_users.json)
+#    - playlists info file (default -> playlists_info.json)
+#    - .cache-USER_ID files for each Spotify user.
+# 5. Invoke the Lambda function. It will update playlists for all users listed in playlist_update_users.json.
 ```
 
 ## Lambda Function Behavior
@@ -47,7 +51,7 @@ The Lambda function will:
 
 ## S3 File Structure
 
-**playlist_update_users.json**:
+**playlist_update_users.json**(default):
 
 ```json
 {
@@ -55,7 +59,7 @@ The Lambda function will:
 }
 ```
 
-**playlists_info.json (initially empty)**:
+**playlists_info.json (initially empty)**(default):
 
 ```json
 {
