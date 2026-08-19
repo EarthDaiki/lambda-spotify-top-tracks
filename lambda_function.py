@@ -1,11 +1,19 @@
 import json
 import traceback
+import logging
 from playlist_manager import PlaylistManager
 from s3_manager import S3Manager
 from json_manager import JsonManager
 from spotify_top_tracks import SpotifyTopTracks
 from spotify_top_artists_tracks import SpotifyTopArtistsTracks
 from spotify_main import SpotifyMain
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(levelname)s] %(name)s: %(message)s"
+)
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 def lambda_handler(event, context):
     """
@@ -42,7 +50,6 @@ def lambda_handler(event, context):
     except Exception as e:
         # Capture full traceback for debugging within CloudWatch logs.
         tb = traceback.format_exc()
-        print(tb)
         return {
             "statusCode": 500,
             "body": json.dumps({

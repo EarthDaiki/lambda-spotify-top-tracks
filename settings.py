@@ -1,3 +1,5 @@
+import os
+
 '''
 Number of top tracks to fetch for each user.
 '''
@@ -13,7 +15,7 @@ Your S3 bucket name.
 All Spotify-related cache, user lists, and playlist info
 will be stored in this bucket.
 """
-BUCKET_NAME: str = 'daiki-spotify'
+BUCKET_NAME: str = os.environ.get('BucketName', None)
 
 """
 A list of user IDs:
@@ -33,3 +35,14 @@ Initially an empty JSON object: {}
 This file stores top_track and top artists tracks playlists uris
 """
 PLAYLIST_INFO_FILE_KEY: str = 'playlists_info.json'
+
+SCOPE = (
+  "user-read-recently-played "
+  "user-read-playback-state "
+  "user-top-read "
+  "user-read-private "
+  "user-library-read "
+  "playlist-modify-private "
+  "playlist-read-private "
+  "user-modify-playback-state"
+)

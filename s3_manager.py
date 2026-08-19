@@ -1,6 +1,7 @@
 import json
 import boto3
 from typing import Optional, Dict, Any
+from botocore.exceptions import ClientError
 
 class S3Manager:
     """
@@ -27,7 +28,7 @@ class S3Manager:
             return json.loads(data)
         except self.s3.exceptions.NoSuchKey:
             print("No cache found in S3.")
-            return {}
+            return None
 
     def save_info(self, bucket_name: str, key: str, data: dict):
         """
@@ -40,5 +41,6 @@ class S3Manager:
                 Body=json.dumps(data, ensure_ascii=False, indent=4),
                 ContentType="application/json"
             )
-        except self.s3.exceptions.NoSuchKey:
-            print("NoSuchKey. Data could not save.")
+        except ClientError as e:
+            print(f"Data could not be saved: {e}")
+            raise

@@ -1,0 +1,57 @@
+name: Deploy Spotify Lambda
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "Lambda/**"
+      - ".github/workflows/deploy-lambda.yml"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: us-east-2
+      LAMBDA_FUNCTION_NAME: SpotifyPlaylistUpdate
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Build Lambda package
+        run: |
+          mkdir -p dist
+          pip install \
+            --requirement Lambda/requirements.txt \
+            --target dist
+          rsync -av \
+            --exclude requirements.txt \
+            --exclude __pycache__ \
+            --exclude "*.pyc" \
+            Lambda/ dist/
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy Lambda
+        uses: aws-actions/aws-lambda-deploy@v1.1.0
+        with:
+          function-name: ${{ env.LAMBDA_FUNCTION_NAME }}
+          code-artifacts-dir: dist
+          handler: lambda_function.lambda_handler
+          runtime: python3.13
+          publish: false

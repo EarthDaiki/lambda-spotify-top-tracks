@@ -1,3 +1,4 @@
+from __future__ import annotations
 from datetime import date
 from settings import *
 from typing import Dict, List, TYPE_CHECKING

@@ -1,3 +1,4 @@
+from __future__ import annotations
 from spotipy.cache_handler import CacheHandler
 from typing import Optional, Dict, Any, TYPE_CHECKING
 if TYPE_CHECKING:
