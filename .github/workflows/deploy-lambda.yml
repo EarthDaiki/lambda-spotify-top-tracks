@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "Lambda/**"
-      - ".github/workflows/deploy-lambda.yml"
 
 permissions:
   id-token: write
@@ -27,19 +24,25 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: "3.12"
 
       - name: Build Lambda package
         run: |
           mkdir -p dist
           pip install \
-            --requirement Lambda/requirements.txt \
+            --requirement requirements.txt \
             --target dist
           rsync -av \
-            --exclude requirements.txt \
-            --exclude __pycache__ \
+            --exclude "dist/" \
+            --exclude ".git/" \
+            --exclude ".github/" \
+            --exclude ".idea/" \
+            --exclude ".venv/" \
+            --exclude "venv/" \
+            --exclude "__pycache__/" \
             --exclude "*.pyc" \
-            Lambda/ dist/
+            --exclude "requirements.txt" \
+            ./ dist/
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -53,5 +56,5 @@ jobs:
           function-name: ${{ env.LAMBDA_FUNCTION_NAME }}
           code-artifacts-dir: dist
           handler: lambda_function.lambda_handler
-          runtime: python3.13
+          runtime: python3.12
           publish: false
